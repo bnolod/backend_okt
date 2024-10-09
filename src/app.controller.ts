@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { AppService } from './app.service';
 import { bankAccountDto } from './bankAccount.dto';
 import { bankAccount } from './bankAccount';
+import {appendFile} from 'fs';
 
 @Controller()
 export class AppController {
@@ -48,16 +49,31 @@ export class AppController {
       });
       return;
     }
+    else {
+      response.redirect('/kifizetesSuccess');
+    }
+
     const account : bankAccount = {
       name: bankAccountDto.name,
       accountNumber: bankAccountDto.accountNumber
     }
-    response.render('kifizetesSuccess', {
-      message: 'Sikeres adatok',
-      data: account
+
+    appendFile('accounts.csv', `${account.name};${account.accountNumber}\n`, (err) => {
+      if (err) {
+        console.error('Error :-(', err);
+      } else {
+        console.log('Adatok mentve');
+      }
     });
+  
+    return;
   }
 
+  @Get('kifizetesSuccess')
+  @Render('kifizetesSuccess')
+  getSuccess() {
+    return;
+  }
 
 
 }
